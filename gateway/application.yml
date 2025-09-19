@@ -1,0 +1,42 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: authorization-gateway
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: auth-gateway-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+kafka:
+  topics:
+    payments-authorize-in: payments.authorize.in
+    payments-persist-in: payments.persist.in
+    payments-rejected: payments.rejected
+    payments-dlq: payments.dlq
+
+external:
+  services:
+    customer:
+      url: http://customer-service:8082
+    credit:
+      url: http://credit-service:8083
+    balance:
+      url: http://balance-service:8084
+
+logging:
+  level:
+    com.sdpayments.gateway: INFO
+    org.springframework.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
