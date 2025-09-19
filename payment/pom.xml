@@ -12,7 +12,7 @@
 	<artifactId>payment</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>payment</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Api responsavel por receber a intenção dos pagamentos</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -54,7 +54,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

@@ -1,6 +1,7 @@
 package com.example.payment.config;
 
-import com.example.payment.event.PaymentEvent;
+
+import com.example.common.event.PaymentEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -30,4 +31,5 @@ public class KafkaProducerConfig {
     public KafkaTemplate<String, PaymentEvent> paymentKafkaTemplate() {
         return new KafkaTemplate<>(paymentProducerFactory());
     }
+
 }

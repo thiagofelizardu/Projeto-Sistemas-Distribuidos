@@ -1,4 +1,4 @@
-package com.example.payment.util;
+package com.example.common.enuns;
 
 public enum Status {
     PENDING, AUTHORIZED, REJECTED, CONFIRMED

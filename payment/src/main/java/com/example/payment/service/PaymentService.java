@@ -1,29 +1,31 @@
 package com.example.payment.service;
 
-import com.example.payment.dto.PaymentRequest;
-import com.example.payment.event.PaymentEvent;
+import com.example.common.dto.PaymentRequest;
+import com.example.common.enuns.Status;
+import com.example.common.event.PaymentEvent;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
-
-
 // Recebe a msg em json
 @Service
 public class PaymentService {
 
-    private final KafkaProducerService kafkaProducerService;
+    private final PaymentProducerService paymentProducerService;
 
-    public PaymentService(KafkaProducerService kafkaProducerService) {
-        this.kafkaProducerService = kafkaProducerService;
+    public PaymentService(PaymentProducerService paymentProducerService) {
+        this.paymentProducerService = paymentProducerService;
     }
 
+    @Async("taskExecutor")
     public UUID processPayment(PaymentRequest request) {
         UUID txId = UUID.randomUUID();
-        String traceId = UUID.randomUUID().toString();
+        UUID traceId = UUID.randomUUID();
 
         PaymentEvent event = new PaymentEvent(
                 txId,
-                traceId,
+                Instant.now(),
                 request.merchantId(),
                 request.customerId(),
                 request.terminalId(),
@@ -32,10 +34,11 @@ public class PaymentService {
                 request.method(),
                 request.entryMode(),
                 request.cardHash(),
-                System.currentTimeMillis()
+                Status.PENDING,
+                traceId
         );
 
-        kafkaProducerService.sendPaymentEvent(event);
+        paymentProducerService.sendPaymentEvent(event);
         return txId;
     }
 

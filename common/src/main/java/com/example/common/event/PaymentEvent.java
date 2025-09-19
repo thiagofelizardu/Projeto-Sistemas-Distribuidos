@@ -1,10 +1,13 @@
-package com.example.payment.event;
+package com.example.common.event;
 
+import com.example.common.enuns.Status;
+
+import java.time.Instant;
 import java.util.UUID;
 
 public record PaymentEvent(
         UUID txId,
-        String traceId,
+        Instant createdAt,
         String merchantId,
         String customerId,
         String terminalId,
@@ -13,5 +16,6 @@ public record PaymentEvent(
         String method,
         String entryMode,
         String cardHash,
-        long timestamp
+        Status status,
+        UUID traceId
 ) {}

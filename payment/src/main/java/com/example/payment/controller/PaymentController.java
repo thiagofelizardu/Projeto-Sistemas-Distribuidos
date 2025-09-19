@@ -1,8 +1,10 @@
 package com.example.payment.controller;
 
-import com.example.payment.dto.PaymentAcceptedResponse;
-import com.example.payment.dto.PaymentRequest;
+import com.example.common.dto.PaymentAcceptedResponse;
+import com.example.common.dto.PaymentRequest;
 import com.example.payment.service.PaymentService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,10 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentAcceptedResponse> createPayment(@RequestBody PaymentRequest request) {
+    public ResponseEntity<PaymentAcceptedResponse> createPayment(@Valid @RequestBody PaymentRequest request) {
+
         UUID txId = paymentService.processPayment(request);
-        return ResponseEntity.accepted().body(new PaymentAcceptedResponse(txId));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new PaymentAcceptedResponse(txId));
+
     }
 }
