@@ -23,16 +23,14 @@ public class AuthorizationService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String persistTopic;
     private final String rejectedTopic;
-    private final String dlqTopic;
 
     public AuthorizationService(KafkaTemplate<String, Object> kafkaTemplate,
                                 @Value("${app.kafka.topics.persist-in}") String persistTopic,
-                                @Value("${app.kafka.topics.rejected}") String rejectedTopic,
-                                @Value("${app.kafka.topics.dlq}") String dlqTopic) {
+                                @Value("${app.kafka.topics.rejected}") String rejectedTopic) {
         this.kafkaTemplate = kafkaTemplate;
         this.persistTopic = persistTopic;
         this.rejectedTopic = rejectedTopic;
-        this.dlqTopic = dlqTopic;
+
     }
 
     @KafkaListener(topics = "${app.kafka.topics.authorize-in}", groupId = "${spring.kafka.consumer.group-id}")

@@ -1,13 +1,8 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+FROM openjdk:17-jdk-slim
 
-WORKDIR /app
-COPY pom.xml .
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
 
-RUN mvn dependency:go-offline
-COPY src ./src
-RUN mvn clean package -DskipTests
+EXPOSE 8080
 
-FROM eclipse-temurin:21-jdk-alpine
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
