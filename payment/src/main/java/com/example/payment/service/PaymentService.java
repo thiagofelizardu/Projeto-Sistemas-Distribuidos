@@ -20,8 +20,6 @@ public class PaymentService {
 
     @Async("taskExecutor")
     public void processPaymentAsync(UUID txId, PaymentRequest request) {
-        UUID traceId = UUID.randomUUID();
-
         PaymentEvent event = new PaymentEvent(
                 txId,
                 Instant.now(),
@@ -33,8 +31,7 @@ public class PaymentService {
                 request.method(),
                 request.entryMode(),
                 request.cardHash(),
-                Status.PENDING,
-                traceId
+                Status.PENDING
         );
         paymentProducerService.sendPaymentEvent(event);
     }

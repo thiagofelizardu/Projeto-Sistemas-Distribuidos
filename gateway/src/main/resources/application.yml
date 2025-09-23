@@ -4,10 +4,10 @@ spring:
 
   kafka:
     # Ajuste para seu ambiente: localhost:29092 (docker local) ou kafka:9092 (dentro do compose)
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     listener:
-      ack-mode: manual     # necessário para usar Acknowledgment
+      ack-mode: manual     # necessï¿½rio para usar Acknowledgment
       concurrency: 3
 
     consumer:
@@ -20,7 +20,7 @@ spring:
         # delega para JsonDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
         spring.json.trusted.packages: com.example.common.event
-        # Se você enviar cabeçalho de tipo por alias, mapeie aqui:
+        # Se vocï¿½ enviar cabeï¿½alho de tipo por alias, mapeie aqui:
         spring.json.type.mapping: >
           paymentEvent:com.example.common.event.PaymentEvent,
           paymentAuthorizedEvent:com.example.common.event.PaymentAuthorizedEvent,
@@ -31,13 +31,13 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        # boas práticas de producer
+        # boas prï¿½ticas de producer
         enable.idempotence: true
         acks: all
         compression.type: zstd
         linger.ms: 5
         max.in.flight.requests.per.connection: 5
-        # incluir cabeçalhos de tipo para facilitar a desserialização no consumidor downstream
+        # incluir cabeï¿½alhos de tipo para facilitar a desserializaï¿½ï¿½o no consumidor downstream
         spring.json.add.type.headers: true
         spring.json.type.mapping: >
           paymentAuthorizedEvent:com.example.common.event.PaymentAuthorizedEvent,

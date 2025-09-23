@@ -1,4 +1,3 @@
-// PaymentRejectionRepository.java
 package com.example.persister.repository;
 
 import com.example.persister.entity.PaymentRejectionEntity;

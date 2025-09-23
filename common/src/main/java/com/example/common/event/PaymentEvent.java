@@ -16,6 +16,5 @@ public record PaymentEvent(
         String method,
         String entryMode,
         String cardHash,
-        Status status,
-        UUID traceId
+        Status status
 ) {}

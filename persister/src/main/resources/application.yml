@@ -4,10 +4,10 @@ spring:
 
   kafka:
     # Default para rodar FORA do Docker; mude via env se precisar.
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     listener:
-      # Use record para não precisar Acknowledgment no código
+      # Use record para nï¿½o precisar Acknowledgment no cï¿½digo
       ack-mode: record
       concurrency: 3
       missing-topics-fatal: false
