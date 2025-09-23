@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.UUID;
-// Recebe a msg em json
+
 @Service
 public class PaymentService {
 
@@ -19,8 +19,7 @@ public class PaymentService {
     }
 
     @Async("taskExecutor")
-    public UUID processPayment(PaymentRequest request) {
-        UUID txId = UUID.randomUUID();
+    public void processPaymentAsync(UUID txId, PaymentRequest request) {
         UUID traceId = UUID.randomUUID();
 
         PaymentEvent event = new PaymentEvent(
@@ -37,9 +36,6 @@ public class PaymentService {
                 Status.PENDING,
                 traceId
         );
-
         paymentProducerService.sendPaymentEvent(event);
-        return txId;
     }
-
 }

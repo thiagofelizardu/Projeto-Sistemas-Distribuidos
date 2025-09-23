@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: persister
+
+  kafka:
+    # Default para rodar FORA do Docker; mude via env se precisar.
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+
+    listener:
+      # Use record para não precisar Acknowledgment no código
+      ack-mode: record
+      concurrency: 3
+      missing-topics-fatal: false
+
+    consumer:
+      group-id: persister-group
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.example.common.event
+        spring.json.type.mapping: >
+          paymentAuthorizedEvent:com.example.common.event.PaymentAuthorizedEvent,
+          paymentRejectedEvent:com.example.common.event.PaymentRejectedEvent
+      max-poll-records: 500
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:a}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  kafka:
+    topics:
+      persist-in: payments.persist.in
+      rejected:   payments.rejected
+      dlq:        payments.dlq
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  kafka:
+    # Quando rodar DENTRO do docker-compose (mesma rede do broker):
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:postgres}

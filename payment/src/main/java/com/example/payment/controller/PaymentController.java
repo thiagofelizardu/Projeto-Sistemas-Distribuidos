@@ -23,9 +23,11 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<PaymentAcceptedResponse> createPayment(@Valid @RequestBody PaymentRequest request) {
-
-        UUID txId = paymentService.processPayment(request);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new PaymentAcceptedResponse(txId));
-
+        UUID txId = UUID.randomUUID();                // gere aqui
+        paymentService.processPaymentAsync(txId, request); // dispare e esqueça
+        return ResponseEntity
+                .accepted()
+                .body(new PaymentAcceptedResponse(txId));
     }
 }
+

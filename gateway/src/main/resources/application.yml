@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: gateway
+
+  kafka:
+    # Ajuste para seu ambiente: localhost:29092 (docker local) ou kafka:9092 (dentro do compose)
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+
+    listener:
+      ack-mode: manual     # necessário para usar Acknowledgment
+      concurrency: 3
+
+    consumer:
+      group-id: gateway-group
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        # delega para JsonDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.example.common.event
+        # Se você enviar cabeçalho de tipo por alias, mapeie aqui:
+        spring.json.type.mapping: >
+          paymentEvent:com.example.common.event.PaymentEvent,
+          paymentAuthorizedEvent:com.example.common.event.PaymentAuthorizedEvent,
+          paymentRejectedEvent:com.example.common.event.PaymentRejectedEvent
+      max-poll-records: 500
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # boas práticas de producer
+        enable.idempotence: true
+        acks: all
+        compression.type: zstd
+        linger.ms: 5
+        max.in.flight.requests.per.connection: 5
+        # incluir cabeçalhos de tipo para facilitar a desserialização no consumidor downstream
+        spring.json.add.type.headers: true
+        spring.json.type.mapping: >
+          paymentAuthorizedEvent:com.example.common.event.PaymentAuthorizedEvent,
+          paymentRejectedEvent:com.example.common.event.PaymentRejectedEvent
+
+app:
+  kafka:
+    topics:
+      authorize-in: payments.authorize.in   # <- usado no @KafkaListener
+      persist-in:   payments.persist.in     # <- usado p/ enviar PaymentAuthorizedEvent
+      rejected:     payments.rejected       # <- usado p/ enviar PaymentRejectedEvent
+server:
+  port: 8081

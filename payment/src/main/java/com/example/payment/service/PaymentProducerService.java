@@ -15,21 +15,25 @@ public class PaymentProducerService {
     private final String topic;
     private final KafkaTemplate<String, PaymentEvent> kafkaTemplate;
 
-    public PaymentProducerService(@Value("${app.kafka.topic}") String topic, KafkaTemplate<String, PaymentEvent> kafkaTemplate) {
+    public PaymentProducerService(
+            @Value("${app.kafka.topic}") String topic,
+            KafkaTemplate<String, PaymentEvent> kafkaTemplate
+    ) {
         this.topic = topic;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     public void sendPaymentEvent(PaymentEvent event) {
-        kafkaTemplate.send(topic, event.merchantId(), event).whenComplete((result, ex) -> {
-            if (ex == null) {
-                log.info("Payment event sent successfully! txId={}, partition={}, offset={}",
-                        event.txId(),
-                        result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset());
-            } else {
-                log.error("Failed to send payment event for txId={}", event.txId(), ex);
-            }
-        });
+        kafkaTemplate.send(topic, event.merchantId(), event)
+                .whenComplete((result, ex) -> {
+                    if (ex == null) {
+                        log.info("Payment event sent: txId={}, partition={}, offset={}",
+                                event.txId(),
+                                result.getRecordMetadata().partition(),
+                                result.getRecordMetadata().offset());
+                    } else {
+                        log.error("Failed to send payment event: txId={}", event.txId(), ex);
+                    }
+                });
     }
 }

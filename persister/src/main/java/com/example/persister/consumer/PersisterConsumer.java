@@ -9,6 +9,7 @@ import com.example.persister.repository.PaymentRejectionRepository;
 import com.example.persister.repository.PaymentRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -20,18 +21,15 @@ import java.time.ZoneOffset;
 
 @Transactional
 @Component
+@RequiredArgsConstructor
 public class PersisterConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(PersisterConsumer.class);
     private final PaymentRepository paymentRepository;
     private final PaymentRejectionRepository rejectionRepository;
+
     private final ObjectMapper objectMapper;
 
-    public PersisterConsumer(PaymentRepository paymentRepository, PaymentRejectionRepository rejectionRepository, ObjectMapper objectMapper) {
-        this.paymentRepository = paymentRepository;
-        this.rejectionRepository = rejectionRepository;
-        this.objectMapper = objectMapper;
-    }
 
     @KafkaListener(topics = "${app.kafka.topics.persist-in}", groupId = "${spring.kafka.consumer.group-id}")
     public void consumeAuthorized(PaymentAuthorizedEvent event) {

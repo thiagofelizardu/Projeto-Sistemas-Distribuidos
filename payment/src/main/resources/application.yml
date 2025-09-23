@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: payment
+  kafka:
+    # perfil default -> LOCAL
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+app:
+  kafka:
+    topic: ${APP_KAFKA_TOPIC:payments.authorize.in}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  kafka:
+    # dentro do docker compose, o host do serviço Kafka costuma ser "kafka"
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
