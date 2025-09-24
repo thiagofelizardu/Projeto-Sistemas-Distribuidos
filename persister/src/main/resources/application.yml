@@ -3,14 +3,15 @@ spring:
     name: persister
 
   kafka:
-    # Default para rodar FORA do Docker; mude via env se precisar.
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     listener:
-      # Use record para n�o precisar Acknowledgment no c�digo
-      ack-mode: record
-      concurrency: 3
+      # Precisa ser BATCH para receber List<PaymentEvent>
+      type: batch
+      ack-mode: manual
+      concurrency: 4
       missing-topics-fatal: false
+      idle-between-polls: 0
 
     consumer:
       group-id: persister-group
@@ -24,35 +25,34 @@ spring:
         spring.json.type.mapping: >
           paymentAuthorizedEvent:com.example.common.event.PaymentAuthorizedEvent,
           paymentRejectedEvent:com.example.common.event.PaymentRejectedEvent
-      max-poll-records: 500
+      max-poll-records: 1000
+      fetch-min-bytes: 1048576         # 1MiB: agrega mais mensagens
+      fetch-max-wait: 500              # até 500ms esperando agrupar
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}?reWriteBatchedInserts=true
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:a}
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+      connection-timeout: 10000
 
   jpa:
+    open-in-view: false
+    show-sql: false
     hibernate:
       ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+        jdbc:
+          batch_size: 500
+        order_inserts: true
+        order_updates: true
 
 app:
   kafka:
     topics:
       persist-in: payments.persist.in
-      rejected:   payments.rejected
       dlq:        payments.dlq
-
----
-spring:
-  config:
-    activate:
-      on-profile: docker
-  kafka:
-    # Quando rodar DENTRO do docker-compose (mesma rede do broker):
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:postgres}

@@ -25,6 +25,10 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
+    // pegue do YAML; se não vier, usa 3
+    @Value("${app.kafka.topics.authorize-in.partitions:3}")
+    private int authorizePartitions;
+
     @Bean
     public ConsumerFactory<String, PaymentEvent> paymentEventConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -43,8 +47,9 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, PaymentEvent> paymentEventKafkaListenerContainerFactory() {
         var f = new ConcurrentKafkaListenerContainerFactory<String, PaymentEvent>();
         f.setConsumerFactory(paymentEventConsumerFactory());
-        f.setConcurrency(3);
         f.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        // defina a concurrency uma única vez, casando com as partições do tópico
+        f.setConcurrency(authorizePartitions);
         return f;
     }
 }

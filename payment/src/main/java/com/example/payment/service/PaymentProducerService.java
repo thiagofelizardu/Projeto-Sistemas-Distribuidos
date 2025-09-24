@@ -28,12 +28,12 @@ public class PaymentProducerService {
         kafkaTemplate.send(topic, key, event)
                 .whenComplete((result, ex) -> {
                     if (ex == null) {
-                        log.info("Payment event sent: txId={}, key={}, partition={}, offset={}",
-                                event.txId(), key,
+                        log.info("Payment event sent: key={}, partition={}, offset={}",
+                                key,
                                 result.getRecordMetadata().partition(),
                                 result.getRecordMetadata().offset());
                     } else {
-                        log.error("Failed to send payment event: txId={}, key={}", event.txId(), key, ex);
+                        log.error("Failed to send payment event:key={}", key, ex);
                     }
                 });
     }

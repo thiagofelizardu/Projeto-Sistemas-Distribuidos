@@ -2,8 +2,18 @@ spring:
   application:
     name: payment
   kafka:
-    # perfil default -> LOCAL
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      retries: 2147483647
+      enable-idempotence: true
+      max-in-flight-requests-per-connection: 5
+      linger-ms: 10
+      batch-size: 131072
+      compression-type: zstd
+      properties:
+        delivery.timeout.ms: 120000
+        request.timeout.ms: 30000
 
 app:
   kafka:
@@ -15,5 +25,5 @@ spring:
     activate:
       on-profile: docker
   kafka:
-    # dentro do docker compose, o host do serviço Kafka costuma ser "kafka"
+    # dentro do docker compose, o host do serviï¿½o Kafka costuma ser "kafka"
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}

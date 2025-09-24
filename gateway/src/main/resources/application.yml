@@ -5,6 +5,8 @@ spring:
   kafka:
     # Ajuste para seu ambiente: localhost:29092 (docker local) ou kafka:9092 (dentro do compose)
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    admin:
+      auto-create: true   # permite criar tópico se não existir
 
     listener:
       ack-mode: manual     # necess�rio para usar Acknowledgment
@@ -46,8 +48,13 @@ spring:
 app:
   kafka:
     topics:
-      authorize-in: payments.authorize.in   # <- usado no @KafkaListener
-      persist-in:   payments.persist.in     # <- usado p/ enviar PaymentAuthorizedEvent
-      rejected:     payments.rejected       # <- usado p/ enviar PaymentRejectedEvent
+      authorize-in:
+        name: payments.authorize.in
+        partitions: 6
+        replicas: 1
+      persist-in:
+        name: payments.persist.in
+        partitions: 6
+        replicas: 1
 server:
   port: 8081

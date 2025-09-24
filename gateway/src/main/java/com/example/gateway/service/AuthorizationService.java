@@ -18,15 +18,16 @@ public class AuthorizationService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Value("${app.kafka.topics.persist-in}")
+    @Value("${app.kafka.topics.persist-in.name}")
     private String persistTopic;
+
 
     public AuthorizationService(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @KafkaListener(
-            topics = "${app.kafka.topics.authorize-in}",
+            topics = "${app.kafka.topics.authorize-in.name}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "paymentEventKafkaListenerContainerFactory"
     )
