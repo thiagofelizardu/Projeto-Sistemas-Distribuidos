@@ -3,14 +3,15 @@ spring:
     name: gateway
 
   kafka:
-    # Ajuste para seu ambiente: localhost:29092 (docker local) ou kafka:9092 (dentro do compose)
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     admin:
-      auto-create: true   # permite criar tópico se não existir
+      auto-create: true
 
     listener:
-      ack-mode: manual     # necess�rio para usar Acknowledgment
-      concurrency: 3
+      ack-mode: manual
+      concurrency: 1
+      missing-topics-fatal: false
+      idle-between-polls: 0
 
     consumer:
       group-id: gateway-group
