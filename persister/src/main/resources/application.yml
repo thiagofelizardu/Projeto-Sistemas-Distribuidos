@@ -9,7 +9,7 @@ spring:
 
     listener:
       ack-mode: manual
-      concurrency: 1
+      concurrency: 5
       missing-topics-fatal: false
       idle-between-polls: 0
 
